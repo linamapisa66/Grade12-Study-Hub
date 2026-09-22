@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://grade12.pages.dev/sitemap.xml

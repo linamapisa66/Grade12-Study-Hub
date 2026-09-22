@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grade 12 Study Hub — Matric Excellence</title>
+<style>
+  :root{
+	--red:#b91c1c; --red-dark:#7f1d1d; --red-bright:#dc2626;
+	--red-light:#fee2e2; --red-mist:#fff1f1;
+	--gold:#c99a1e; --gold-dark:#8a6a10; --gold-light:#fdf3d6;
+	--ink:#241414; --ink-soft:#6b5555;
+	--bg:#fffafa; --card:#ffffff; --line:#f1dede;
+	--radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-padding-top:78px}
+  body{
+	background:var(--bg); color:var(--ink);
+	font-family:'Georgia',serif;
+	padding-top:env(safe-area-inset-top,0px);
+	padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  h1,h2,h3,.brand,.tab,.btn,.count{font-family:Arial,Helvetica,sans-serif}
+
+  /* ---------- header ---------- */
+  header{
+	background:linear-gradient(135deg,var(--red-bright),var(--red-dark));
+	color:#fff; padding:34px 20px 28px; text-align:center;
+	padding-top:calc(34px + env(safe-area-inset-top,0px));
+	border-bottom:3px solid var(--gold);
+  }
+  header .brand{font-size:.78rem;letter-spacing:.08em;opacity:.95;font-weight:700;color:var(--gold-light)}
+  header h1{font-size:2.1rem;margin-top:6px;font-family:Georgia,serif}
+  header h1 .accent{color:var(--gold-light)}
+  header p{opacity:.92;margin-top:8px;max-width:520px;margin-left:auto;margin-right:auto;font-size:.98rem}
+
+  /* ---------- sticky controls ---------- */
+  .controls{
+	position:sticky; top:0; z-index:20; background:#fff;
+	box-shadow:0 2px 10px rgba(120,20,20,0.08);
+	padding:12px 16px; padding-top:calc(12px + env(safe-area-inset-top,0px));
+  }
+  .search-row{max-width:1000px;margin:0 auto 10px;display:flex;gap:8px}
+  .search-row input{
+	flex:1; border:2px solid var(--red-light); border-radius:10px;
+	padding:11px 14px; font-size:0.95rem; font-family:Arial,sans-serif; outline:none;
+	color:var(--ink);
+  }
+  .search-row input:focus{border-color:var(--gold)}
+  .tabs{max-width:1000px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .tabs::-webkit-scrollbar{height:4px}
+  .tab{
+	flex:0 0 auto; border:2px solid var(--red-light); background:#fff;
+	color:var(--red-dark); font-weight:700; font-size:.82rem;
+	padding:7px 14px; border-radius:999px; cursor:pointer; white-space:nowrap;
+  }
+  .tab.active{background:var(--red); border-color:var(--gold); color:#fff; box-shadow:0 0 0 1px var(--gold) inset}
+
+  /* ---------- subject grid ---------- */
+  .section-title{
+	max-width:1100px;margin:26px auto 4px;padding:0 20px 6px;
+	color:var(--red-dark); font-size:1.15rem; font-family:Arial,sans-serif; font-weight:800;
+	border-bottom:2px solid var(--gold-light);
+  }
+  .grid{
+	display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+	gap:14px;padding:14px 20px;max-width:1100px;margin:0 auto;
+  }
+  .subject{
+	background:var(--card); border-radius:var(--radius); padding:16px 16px 14px;
+	border:1px solid var(--line); border-left:5px solid var(--red);
+	box-shadow:0 3px 10px rgba(120,20,20,0.05);
+	cursor:pointer; text-align:left; font:inherit; color:inherit;
+	display:flex; flex-direction:column; gap:6px; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .subject:hover, .subject:focus-visible{
+	box-shadow:0 8px 18px rgba(120,20,20,0.14); transform:translateY(-2px);
+	outline:none; border-left-color:var(--gold);
+  }
+  .subject h3{font-size:1.02rem;color:var(--ink)}
+  .subject .tag{font-size:.72rem;color:var(--ink-soft)}
+  .subject .go{
+	margin-top:6px;font-size:.82rem;font-weight:800;color:var(--gold-dark);
+	display:flex;align-items:center;gap:5px;
+  }
+  .empty-msg{max-width:600px;margin:40px auto;text-align:center;color:var(--ink-soft);padding:0 20px}
+
+  /* ---------- modal ---------- */
+  .overlay{
+	position:fixed;inset:0;background:rgba(40,10,10,0.5);
+	display:none;align-items:flex-end;justify-content:center;z-index:100;
+	padding:0;
+  }
+  .overlay.open{display:flex}
+  @media (min-width:640px){ .overlay{align-items:center;padding:20px} }
+  .modal{
+	background:#fff;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+	border-radius:20px 20px 0 0; padding:22px 22px calc(22px + env(safe-area-inset-bottom,0px));
+	box-shadow:0 -8px 30px rgba(0,0,0,0.25);
+	border-top:3px solid var(--gold);
+  }
+  @media (min-width:640px){ .modal{border-radius:18px} }
+  .modal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .modal-top h2{color:var(--red-dark);font-size:1.3rem;font-family:Arial,sans-serif}
+  .modal-top .tag{font-size:.78rem;color:var(--gold-dark);margin-top:4px;font-weight:700}
+  .close-btn{
+	background:var(--red-mist);border:none;color:var(--red-dark);
+	width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;flex:0 0 auto;
+  }
+  .res-list{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .res-link{
+	display:flex;align-items:center;gap:12px;
+	border:1px solid var(--line);border-radius:12px;padding:13px 14px;
+	text-decoration:none;color:var(--ink);background:var(--red-mist);
+  }
+  .res-link:active{background:var(--gold-light)}
+  .res-emoji{font-size:1.3rem}
+  .res-text b{display:block;font-family:Arial,sans-serif;font-size:.92rem;color:var(--ink)}
+  .res-text span{font-size:.78rem;color:var(--ink-soft)}
+  .modal-note{margin-top:16px;font-size:.78rem;color:var(--ink-soft);line-height:1.5}
+
+  footer{background:var(--red-dark);color:#fff;text-align:center;padding:22px 16px 30px;margin-top:36px;font-family:Arial,sans-serif;font-size:.85rem;opacity:.92;border-top:3px solid var(--gold)}
+  footer a{color:var(--gold-light)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">SOUTH AFRICA · CAPS ALIGNED</div>
+  <h1>Grade 12 Study Hub <span class="accent">— Matric Excellence</span></h1>
+  <p>Your final push to Matric — tap any subject below for study guides, past papers with memos, and practice questions.</p>
+</header>
+
+<div class="controls">
+  <div class="search-row">
+	<input id="searchBox" type="text" placeholder="Search a subject, e.g. Accounting, isiZulu, Physical Sciences…" autocomplete="off">
+  </div>
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<div id="gridWrap"></div>
+
+<footer>
+  Built for South African matrics · Links go to the Department of Basic Education, WCED ePortal and Siyavula
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBox" role="dialog" aria-modal="true">
+	<div class="modal-top">
+	  <div>
+		<h2 id="modalTitle">Subject</h2>
+		<div class="tag" id="modalTag">Category</div>
+	  </div>
+	  <button class="close-btn" id="closeBtn" aria-label="Close">✕</button>
+	</div>
+	<div class="res-list" id="resList"></div>
+	<div class="modal-note">Study guides and video links open a search for that subject so you always land on current results. Papers and memos link straight to the Department of Basic Education, WCED ePortal, and Siyavula.</div>
+  </div>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const DBE_PAPERS = "https://www.education.gov.za/Curriculum/NationalSeniorCertificate(NSC)Examinations/NSCPastExaminationpapers.aspx";
+const WCED_PAPERS = "https://wcedonline.westerncape.gov.za/grade-12-question-papers";
+const SIYAVULA = "https://www.siyavula.com";
+
+const siyavulaSubjects = new Set(["Mathematics","Mathematical Literacy","Physical Sciences","Life Sciences","Computer Applications Technology (CAT)","Information Technology (IT)"]);
+
+function ytSearch(name){ return "https://www.youtube.com/results?search_query=" + encodeURIComponent("Grade 12 " + name + " CAPS South Africa lesson"); }
+function gStudyGuide(name){ return "https://www.google.com/search?q=" + encodeURIComponent("Grade 12 " + name + " study guide notes summary South Africa"); }
+function gMindTheGap(name){ return "https://www.google.com/search?q=" + encodeURIComponent("Mind the Gap Grade 12 " + name + " pdf Department of Basic Education"); }
+
+const categories = [
+  { key:"languages", label:"Languages" },
+  { key:"maths", label:"Maths & Sciences" },
+  { key:"commerce", label:"Commerce" },
+  { key:"humanities", label:"Humanities" },
+  { key:"tech", label:"Technology" },
+  { key:"arts", label:"Arts & Culture" },
+  { key:"other", label:"Life Orientation & Other" },
+];
+
+const subjects = [
+  // Languages
+  { name:"English Home Language", cat:"languages" },
+  { name:"English First Additional Language", cat:"languages" },
+  { name:"Afrikaans Home Language", cat:"languages" },
+  { name:"Afrikaans First Additional Language", cat:"languages" },
+  { name:"isiZulu Home Language", cat:"languages" },
+  { name:"isiZulu First Additional Language", cat:"languages" },
+  { name:"isiXhosa Home Language", cat:"languages" },
+  { name:"isiXhosa First Additional Language", cat:"languages" },
+  { name:"Sepedi Home Language", cat:"languages" },
+  { name:"Setswana Home Language", cat:"languages" },
+  { name:"Sesotho Home Language", cat:"languages" },
+  { name:"siSwati Home Language", cat:"languages" },
+  { name:"Tshivenda Home Language", cat:"languages" },
+  { name:"Xitsonga Home Language", cat:"languages" },
+  { name:"isiNdebele Home Language", cat:"languages" },
+  // Maths & Sciences
+  { name:"Mathematics", cat:"maths" },
+  { name:"Mathematical Literacy", cat:"maths" },
+  { name:"Physical Sciences", cat:"maths" },
+  { name:"Life Sciences", cat:"maths" },
+  { name:"Agricultural Sciences", cat:"maths" },
+  // Commerce
+  { name:"Accounting", cat:"commerce" },
+  { name:"Business Studies", cat:"commerce" },
+  { name:"Economics", cat:"commerce" },
+  // Humanities
+  { name:"Geography", cat:"humanities" },
+  { name:"History", cat:"humanities" },
+  { name:"Tourism", cat:"humanities" },
+  { name:"Religion Studies", cat:"humanities" },
+  // Technology
+  { name:"Computer Applications Technology (CAT)", cat:"tech" },
+  { name:"Information Technology (IT)", cat:"tech" },
+  { name:"Engineering Graphics and Design (EGD)", cat:"tech" },
+  { name:"Civil Technology", cat:"tech" },
+  { name:"Mechanical Technology", cat:"tech" },
+  { name:"Electrical Technology", cat:"tech" },
+  // Arts
+  { name:"Visual Arts", cat:"arts" },
+  { name:"Dramatic Arts", cat:"arts" },
+  { name:"Music", cat:"arts" },
+  { name:"Dance Studies", cat:"arts" },
+  { name:"Design", cat:"arts" },
+  // Other
+  { name:"Life Orientation", cat:"other" },
+  { name:"Consumer Studies", cat:"other" },
+  { name:"Agricultural Management Practices", cat:"other" },
+  { name:"Agricultural Technology", cat:"other" },
+];
+
+/* ---------------- render tabs ---------------- */
+const tabsEl = document.getElementById("tabs");
+let activeTab = "all";
+function renderTabs(){
+  const all = [{key:"all",label:"All subjects"}, ...categories];
+  tabsEl.innerHTML = all.map(c =>
+	`<button class="tab ${c.key===activeTab?'active':''}" data-key="${c.key}">${c.label}</button>`
+  ).join("");
+  tabsEl.querySelectorAll(".tab").forEach(btn=>{
+	btn.addEventListener("click", ()=>{ activeTab = btn.dataset.key; renderTabs(); renderGrid(); });
+  });
+}
+
+/* ---------------- render grid ---------------- */
+const gridWrap = document.getElementById("gridWrap");
+function catLabel(key){ return (categories.find(c=>c.key===key)||{}).label || key; }
+
+function renderGrid(){
+  const q = document.getElementById("searchBox").value.trim().toLowerCase();
+  let list = subjects.filter(s => activeTab==="all" || s.cat===activeTab);
+  if(q) list = list.filter(s => s.name.toLowerCase().includes(q));
+
+  if(list.length===0){
+	gridWrap.innerHTML = `<div class="empty-msg">No subject matches “${q}”. Try a shorter search, like “maths” or “zulu”.</div>`;
+	return;
+  }
+
+  // group by category when showing "all"
+  if(activeTab==="all" && !q){
+	gridWrap.innerHTML = categories.map(c=>{
+	  const items = subjects.filter(s=>s.cat===c.key);
+	  return `<div class="section-title">${c.label}</div><div class="grid">${items.map(cardHtml).join("")}</div>`;
+	}).join("");
+  } else {
+	gridWrap.innerHTML = `<div class="grid" style="margin-top:18px">${list.map(cardHtml).join("")}</div>`;
+  }
+
+  gridWrap.querySelectorAll(".subject").forEach(el=>{
+	el.addEventListener("click", ()=> openModal(el.dataset.name, el.dataset.cat));
+  });
+}
+
+function cardHtml(s){
+  return `<button class="subject" data-name="${escapeAttr(s.name)}" data-cat="${s.cat}">
+	<h3>${s.name}</h3>
+	<div class="tag">${catLabel(s.cat)}</div>
+	<div class="go">View resources →</div>
+  </button>`;
+}
+function escapeAttr(str){ return str.replace(/"/g,'&quot;'); }
+
+/* ---------------- modal ---------------- */
+const overlay = document.getElementById("overlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalTag = document.getElementById("modalTag");
+const resList = document.getElementById("resList");
+
+function buildResources(name){
+  const res = [];
+  res.push({ emoji:"📝", title:"Past Papers & Memos (DBE)", desc:"Official Department of Basic Education exam papers", url:DBE_PAPERS });
+  res.push({ emoji:"📚", title:"Past Papers & Memos (WCED ePortal)", desc:"Searchable archive by subject and year", url:WCED_PAPERS });
+  if(siyavulaSubjects.has(name)){
+	res.push({ emoji:"✅", title:"Siyavula Practice", desc:"Free unlimited practice questions with instant feedback", url:SIYAVULA });
+  }
+  res.push({ emoji:"📖", title:"Study Guide Search", desc:"Mind the Gap guides, notes & summaries for " + name, url:gMindTheGap(name) });
+  res.push({ emoji:"🎥", title:"Video Lessons", desc:"Lesson videos and explainers for " + name, url:ytSearch(name) });
+  res.push({ emoji:"🔎", title:"More Notes & Summaries", desc:"General web search for " + name + " study material", url:gStudyGuide(name) });
+  return res;
+}
+
+function openModal(name, cat){
+  modalTitle.textContent = name;
+  modalTag.textContent = catLabel(cat) + " · Grade 12";
+  resList.innerHTML = buildResources(name).map(r=>
+	`<a class="res-link" href="${r.url}" target="_blank" rel="noopener">
+	   <span class="res-emoji">${r.emoji}</span>
+	   <span class="res-text"><b>${r.title}</b><span>${r.desc}</span></span>
+	 </a>`
+  ).join("");
+  overlay.classList.add("open");
+}
+document.getElementById("closeBtn").addEventListener("click", ()=> overlay.classList.remove("open"));
+overlay.addEventListener("click", (e)=>{ if(e.target===overlay) overlay.classList.remove("open"); });
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") overlay.classList.remove("open"); });
+
+document.getElementById("searchBox").addEventListener("input", renderGrid);
+
+renderTabs();
+renderGrid();
+</script>
+</body>
+</html>
